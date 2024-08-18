@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raster vs Vector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+        .container {
+            width: 45%;
+        }
+        .canvas-container, .svg-container {
+            border: 1px solid #000;
+            width: 400px;
+            height: 400px;
+            margin-top: 10px;
+        }
+        canvas, svg {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Rasterizado (Canvas)</h2>
+        <div class="menu">
+            <label for="shape-canvas">Selecciona la figura:</label>
+            <select id="shape-canvas">
+                <option value="circle">Círculo</option>
+                <option value="rectangle">Rectángulo</option>
+                <option value="triangle">Triángulo</option>
+            </select>
+
+            <label for="color-canvas">Color:</label>
+            <input type="color" id="color-canvas" value="#ff0000">
+
+            <label for="x-canvas">X / Radio:</label>
+            <input type="number" id="x-canvas" value="100">
+
+            <label for="y-canvas">Y / Ángulo:</label>
+            <input type="number" id="y-canvas" value="100">
+
+            <label for="width-canvas">Ancho / Radio:</label>
+            <input type="number" id="width-canvas" value="50">
+
+            <label for="height-canvas">Alto (solo para rectángulo):</label>
+            <input type="number" id="height-canvas" value="50">
+
+            <button id="draw-canvas">Dibujar en Canvas</button>
+        </div>
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Vectorizado (SVG)</h2>
+        <div class="menu">
+            <label for="shape-svg">Selecciona la figura:</label>
+            <select id="shape-svg">
+                <option value="circle">Círculo</option>
+                <option value="rectangle">Rectángulo</option>
+                <option value="triangle">Triángulo</option>
+            </select>
+
+            <label for="color-svg">Color:</label>
+            <input type="color" id="color-svg" value="#00ff00">
+
+            <label for="x-svg">X:</label>
+            <input type="number" id="x-svg" value="100">
+
+            <label for="y-svg">Y:</label>
+            <input type="number" id="y-svg" value="100">
+
+            <label for="width-svg">Ancho / Radio:</label>
+            <input type="number" id="width-svg" value="50">
+
+            <label for="height-svg">Alto (solo para rectángulo):</label>
+            <input type="number" id="height-svg" value="50">
+
+            <button id="draw-svg">Dibujar en SVG</button>
+        </div>
+        <div class="svg-container">
+            <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
