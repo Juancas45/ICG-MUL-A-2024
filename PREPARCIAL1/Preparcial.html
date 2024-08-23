@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Trazado de Polígonos Regulares</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Trazado de Polígonos Regulares</h1>
+  <form>
+    <label for="n">Número de lados (n):</label>
+    <input type="number" id="n" min="5" max="20" value="5"><br><br>
+    <label for="lado">Lado (L):</label>
+    <input type="number" id="lado" value="300"><br><br>
+    <label for="centro">Coordenada del centro (x, y):</label>
+    <input type="text" id="centro" value="400, 400"><br><br>
+    <button type="button" onclick="dibujarPoligono()">Dibujar</button>
+    <button type="button" onclick="borrarPoligono()">Borrar</button>
+  </form>
+  <canvas id="canvas" width="800" height="800"></canvas>
+  <p id="coordenadas"></p>
+  <p id="apotema-label"></p>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const coordenadasElement = document.getElementById('coordenadas');
+    const apotemaLabel = document.getElementById('apotema-label');
+
+    function dibujarPoligono() {
+      const n = parseInt(document.getElementById('n').value);
+      const lado = parseInt(document.getElementById('lado').value);
+      const centro = document.getElementById('centro').value;
+
+      // Calcula el apotema del polígono
+      const apotemaCalculado = lado / (2 * Math.tan(Math.PI / n));
+      apotemaLabel.textContent = `El apotema es: ${apotemaCalculado}`;
+
+      // Procesa la coordenada del centro
+      const centroParts = centro.split(',');
+      let centerX, centerY;
+      if (centroParts.length === 2) {
+        centerX = parseFloat(centroParts[0]);
+        centerY = parseFloat(centroParts[1]);
+        coordenadasElement.textContent = `Coordenadas cartesianas: (${centerX}, ${centerY})`;
+      } else {
+        alert('Formato de coordenada del centro inválido');
+        return;
+      }
+
+      // Calcula el ángulo para que la base del polígono esté en la parte inferior
+      const angleOffset = -Math.PI / 2;
+
+      // Dibuja el polígono en el canvas
+      ctx.beginPath();
+      ctx.moveTo(
+        centerX + apotemaCalculado * Math.cos(angleOffset),
+        centerY + apotemaCalculado * Math.sin(angleOffset)
+      );
+
+      for (let i = 1; i < n; i++) {
+        ctx.lineTo(
+          centerX + apotemaCalculado * Math.cos(angleOffset + 2 * Math.PI * i / n),
+          centerY + apotemaCalculado * Math.sin(angleOffset + 2 * Math.PI * i / n)
+        );
+      }
+
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    function borrarPoligono() {
+      // Limpia el canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Opcional: Restablecer los textos de coordenadas y apotema
+      coordenadasElement.textContent = '';
+      apotemaLabel.textContent = '';
+    }
+  </script>
+</body>
+</html>
