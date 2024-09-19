@@ -12,7 +12,7 @@ class Linea {
         line.setAttribute("y1", this._y1);
         line.setAttribute("x2", this._x2);
         line.setAttribute("y2", this._y2);
-        line.setAttribute("stroke", "blue");
+        line.setAttribute("stroke", "black");
         svg.appendChild(line);
     }
 }
@@ -29,7 +29,7 @@ class Circunferencia {
         circ.setAttribute("cx", this._cx);
         circ.setAttribute("cy", this._cy);
         circ.setAttribute("r", this._radio);
-        circ.setAttribute("stroke", "blue");
+        circ.setAttribute("stroke", "black");
         circ.setAttribute("fill", "none");
         svg.appendChild(circ);
     }
@@ -49,7 +49,7 @@ class Elipse {
         elipse.setAttribute("cy", this._cy);
         elipse.setAttribute("rx", this._a);
         elipse.setAttribute("ry", this._b);
-        elipse.setAttribute("stroke", "blue");
+        elipse.setAttribute("stroke", "black");
         elipse.setAttribute("fill", "none");
         svg.appendChild(elipse);
     }
