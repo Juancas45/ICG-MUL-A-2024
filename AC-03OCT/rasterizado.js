@@ -1,32 +1,40 @@
 class Punto {
     constructor(x, y) {
-        this._x = x;
-        this._y = y;
+        this.#x = x; // Atributo privado
+        this.#y = y; // Atributo privado
     }
 
+    #x; // Atributo privado
+    #y; // Atributo privado
+
     get x() {
-        return this._x;
+        return this.#x; // Método getter para x
     }
 
     get y() {
-        return this._y;
+        return this.#y; // Método getter para y
     }
+}
+
+// Función para generar un valor aleatorio en un rango con margen
+function generarValorAleatorioConMargen(min, max, margen) {
+    const rangoMin = min + margen;
+    const rangoMax = max - margen;
+    return Math.random() * (rangoMax - rangoMin) + rangoMin;
 }
 
 // Función para generar puntos aleatorios dentro del canvas
 function generarPuntosAleatorios(numPuntos, ancho, alto) {
     const puntos = [];
+    const margen = 30; // Margen para evitar que los puntos se dibujen en los bordes
+
     for (let i = 0; i < numPuntos; i++) {
-        const x = Math.random() * ancho;
-        const y = Math.random() * alto;
+        let x = generarValorAleatorioConMargen(0, ancho, margen);
+        let y = generarValorAleatorioConMargen(0, alto, margen);
         puntos.push(new Punto(x, y));
     }
-    return puntos;
+    return puntos; // Devolver los puntos sin ordenar
 }
-
-// Obtener el contexto del canvas
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
 
 // Función para calcular el centroide
 function calcularCentroide(puntos) {
@@ -43,8 +51,8 @@ function calcularAngulo(centroide, punto) {
     return Math.atan2(punto.y - centroide.y, punto.x - centroide.x);
 }
 
-// Función para ordenar puntos según el ángulo con respecto al centroide
-function ordenarPuntos(puntos) {
+// Función personalizada para ordenar puntos según el ángulo con respecto al centroide
+function ordenarPuntosPorAngulo(puntos) {
     const centroide = calcularCentroide(puntos);
     return puntos.slice().sort((a, b) => calcularAngulo(centroide, a) - calcularAngulo(centroide, b));
 }
@@ -73,61 +81,64 @@ function esConvexo(puntos) {
     return positivos === 0 || negativos === 0;
 }
 
-// Función para dibujar el polígono
-function dibujarPoligono(puntos) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar canvas
-    ctx.beginPath();
-    ctx.moveTo(puntos[0].x, puntos[0].y);
-    puntos.forEach((punto, i) => {
-        const siguiente = puntos[(i + 1) % puntos.length];
-        ctx.lineTo(siguiente.x, siguiente.y);
-    });
-    ctx.closePath();
-    ctx.stroke();
+// Función para dibujar el polígono en el canvas
+function dibujarPoligono(contexto, puntos, mostrarCentroide) {
+    contexto.clearRect(0, 0, contexto.canvas.width, contexto.canvas.height); // Limpiar el canvas
+    contexto.beginPath();
+    contexto.moveTo(puntos[0].x, puntos[0].y);
+    for (let i = 1; i < puntos.length; i++) {
+        contexto.lineTo(puntos[i].x, puntos[i].y);
+    }
+    contexto.closePath();
+
+    // Rellenar el polígono
+    contexto.fillStyle = 'lightblue'; // Color de relleno
+    contexto.fill(); // Rellenar el área del polígono
+    contexto.stroke(); // Dibujar el contorno
+
+    // Dibujar el centroide si se debe mostrar
+    if (mostrarCentroide) {
+        const centroide = calcularCentroide(puntos);
+        contexto.beginPath();
+        contexto.arc(centroide.x, centroide.y, 5, 0, Math.PI * 2); // Dibuja un círculo en el centroide
+        contexto.fillStyle = 'orange'; // Color del centroide
+        contexto.fill(); // Rellenar el círculo
+        contexto.stroke(); // Dibujar el contorno del círculo
+
+        // Dibujar líneas del centroide a cada punto
+        dibujarLineasCentroide(contexto, puntos, centroide);
+    }
 }
 
-// Dibujar las líneas del centroide a los puntos
-function dibujarLineasCentroide(puntos, centroide) {
+// Función para dibujar las líneas del centroide a los puntos
+function dibujarLineasCentroide(contexto, puntos, centroide) {
+    contexto.strokeStyle = "red"; // Color de las líneas
     puntos.forEach(punto => {
-        ctx.beginPath();
-        ctx.moveTo(centroide.x, centroide.y);
-        ctx.lineTo(punto.x, punto.y);
-        ctx.strokeStyle = 'red';
-        ctx.stroke();
+        contexto.beginPath();
+        contexto.moveTo(centroide.x, centroide.y);
+        contexto.lineTo(punto.x, punto.y);
+        contexto.stroke();
     });
 }
 
 // Generar puntos aleatorios y garantizar que estén ordenados
-function generarPuntosVisibles(numPuntos, ancho, alto) {
-    const puntos = [];
-    const margen = 30; // Margen para evitar que los puntos se dibujen en los bordes
+const puntos = generarPuntosAleatorios(6, 400, 400);
+const puntosOrdenados = ordenarPuntosPorAngulo(puntos); // Ordenar los puntos
+let mostrarCentroide = true; // Bandera para mostrar/ocultar el centroide
 
-    for (let i = 0; i < numPuntos; i++) {
-        let x = Math.random() * (ancho - 2 * margen) + margen;
-        let y = Math.random() * (alto - 2 * margen) + margen;
-        puntos.push(new Punto(x, y));
-    }
-
-    return ordenarPuntos(puntos); // Ordenar los puntos para formar un polígono
-}
-
-// Generar puntos aleatorios
-const puntos = generarPuntosVisibles(6, canvas.width, canvas.height);
-let mostrarCentroide = false;
-const centroide = calcularCentroide(puntos);
+// Obtener el contexto del canvas
+const canvas = document.getElementById('canvas');
+const contexto = canvas.getContext('2d');
 
 // Dibujar el polígono inicialmente
-dibujarPoligono(puntos);
+dibujarPoligono(contexto, puntosOrdenados, mostrarCentroide);
 
 // Determinar si es convexo o cóncavo
-const resultado = esConvexo(puntos) ? "Los puntos forman un polígono convexo." : "Los puntos forman un polígono cóncavo.";
+const resultado = esConvexo(puntosOrdenados) ? "Los puntos forman un polígono convexo." : "Los puntos forman un polígono cóncavo.";
 document.getElementById('resultado').textContent = resultado;
 
 // Añadir el botón para mostrar/ocultar el centroide
 document.getElementById('toggle-centroid').addEventListener('click', function() {
-    mostrarCentroide = !mostrarCentroide;
-    dibujarPoligono(puntos); // Redibujar el polígono
-    if (mostrarCentroide) {
-        dibujarLineasCentroide(puntos, centroide);
-    }
+    mostrarCentroide = !mostrarCentroide; // Cambiar el estado de mostrar/ocultar
+    dibujarPoligono(contexto, puntosOrdenados, mostrarCentroide); // Redibujar el polígono
 });
